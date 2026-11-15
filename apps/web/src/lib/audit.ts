@@ -19,6 +19,13 @@ export const ENTITY_LABEL: Record<string, string> = {
   drivers: "Motorista",
   vehicle_categories: "Categoria de veículo",
   platform_settings: "Configuração",
+  locations: "Local",
+  passengers: "Passageiro",
+  pricing_rules: "Regra de preço",
+  bookings: "Reserva",
+  booking_segments: "Trecho da reserva",
+  segment_costs: "Composição de preço",
+  services: "Serviço",
 };
 
 export const ACTION_LABEL: Record<AuditRow["action"], string> = { insert: "Criou", update: "Alterou", delete: "Removeu" };

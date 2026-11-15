@@ -21,6 +21,7 @@ export const SETTINGS: Record<string, SettingDef> = {
   wait_tolerance_airport_min: { kind: "number", label: "Tolerância de espera · aeroporto", unit: "min", hint: "Contada a partir do pouso real do voo", min: 0, max: 240, group: "operacao" },
   wait_tolerance_bus_station_min: { kind: "number", label: "Tolerância de espera · rodoviária", unit: "min", hint: "Contada a partir da chegada do ônibus", min: 0, max: 240, group: "operacao" },
   min_booking_lead_hours: { kind: "number", label: "Antecedência mínima para reservar", unit: "horas", hint: "Pedidos com menos tempo vão para a central", min: 0, max: 72, group: "operacao" },
+  quote_validity_hours: { kind: "number", label: "Validade da cotação", unit: "horas", hint: "Depois disso o preço precisa ser recalculado antes de confirmar", min: 1, max: 720, group: "operacao" },
   offer_accept_window_sec: { kind: "number", label: "Prazo para aceitar uma oferta", unit: "segundos", hint: "Depois disso a oferta vai ao próximo prestador", min: 15, max: 600, group: "operacao" },
   document_expiry_warning_days: { kind: "number", label: "Aviso de documento a vencer", unit: "dias", hint: "Antecedência dos alertas de vencimento", min: 1, max: 120, group: "operacao" },
   default_timezone: { kind: "choice", label: "Fuso horário padrão", hint: "Horários são guardados em UTC e exibidos neste fuso", options: TIMEZONES, group: "operacao" },
