@@ -12,7 +12,8 @@ export default function AgenciaPage() {
       description="Passageiros, cotações, reservas e acompanhamento dos transfers."
       nav={AGENCY_NAV}
       upcoming={[
-        { phase: "Fase 3", items: "passageiros, reservas com ida e volta, cotação e importação em lote" },
+        { phase: "Disponível", items: "passageiros, locais e reservas com ida e volta, com preço antes de confirmar (menu acima)" },
+        { phase: "Fase 3", items: "importação de reservas em lote" },
         { phase: "Fase 4", items: "acompanhamento da distribuição e do motorista designado" },
         { phase: "Fase 7", items: "cobranças, faturas e comprovantes" },
       ]}

@@ -19,7 +19,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     title: "Operação",
     items: [
       { href: "#", label: "Central de serviços", icon: "activity", phase: "Fase 4" },
-      { href: "#", label: "Reservas", icon: "book", phase: "Fase 3" },
+      { href: "/admin/reservas", label: "Reservas", icon: "book" },
       { href: "#", label: "Viagens", icon: "route", phase: "Fase 5" },
     ],
   },
@@ -35,7 +35,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     title: "Regras do negócio",
     items: [
-      { href: "#", label: "Tarifas e rotas", icon: "tag", phase: "Fase 3" },
+      { href: "/admin/tarifas", label: "Tarifas e rotas", icon: "tag" },
       { href: "#", label: "Distribuição", icon: "shuffle", phase: "Fase 4" },
     ],
   },

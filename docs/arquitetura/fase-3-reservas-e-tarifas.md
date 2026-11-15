@@ -84,3 +84,14 @@ O teste usa um banco local de mentira para login (`auth.users` e `auth.uid()` si
 - **Alteração de reserva confirmada** (mudar horário ou local com diferença de preço): não implementada; hoje é cancelar e refazer.
 - **Fuso** do dia de vigência da regra está fixo em America/Sao_Paulo.
 - Matriz completa de transições de estado do serviço chega com a Fase 4.
+
+## Telas
+
+- Admin · **Tarifas e rotas** (`/admin/tarifas`): regras de preço (criar, editar, ativar) e locais da plataforma.
+- Admin · **Reservas** (`/admin/reservas`): lista por situação e detalhe com composição do preço, cotação manual, histórico dos serviços e livro-razão.
+- Agência · **Reservas** (`/agencia/reservas`): lista, nova reserva (ida e volta) e detalhe com confirmar, recalcular e cancelar.
+- Agência · **Passageiros** e **Locais**.
+
+Código compartilhado: `src/lib/bookings.ts` (rótulos e formatos), `src/lib/booking-actions.ts` (ações), `src/lib/booking-data.ts` (consultas), `src/components/booking-forms.tsx` e `booking-view.tsx`.
+
+Conferido no navegador com a conta de superadmin: telas do Admin carregam com dados reais. As telas da agência passaram no build, mas ainda não foram abertas com uma conta de agência.
