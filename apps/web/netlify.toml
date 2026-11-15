@@ -4,3 +4,8 @@
 [build]
   command = "npm run build"
   publish = ".next"
+
+# Adaptador oficial de Next.js (rotas, funções de servidor e proxy).
+# Sem ele o Netlify publica a pasta .next crua e todas as páginas dão 404.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
