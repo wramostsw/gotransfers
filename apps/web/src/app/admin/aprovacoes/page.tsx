@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AppShell, PageHeader, PageSkeleton } from "@/components/app-shell";
+import { AdminHeader, AdminSkeleton } from "@/components/admin/kit";
 import { Badge, Card, EmptyState } from "@/components/ui";
 import { requireArea } from "@/lib/auth";
 import { LANGUAGE_LABEL, formatPlate, licenseBadge } from "@/lib/fleet";
-import { ADMIN_NAV } from "@/lib/nav";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewForm } from "./review-form";
 
-export const metadata: Metadata = { title: "Aprovações" };
+export const metadata: Metadata = { title: "Aprovações · Admin" };
 
 type Org = { trade_name: string; status: string } | null;
 
@@ -42,15 +41,15 @@ type PendingDriver = {
 
 export default function AprovacoesPage() {
   return (
-    <AppShell area="Admin Master" nav={ADMIN_NAV}>
-      <PageHeader
+    <>
+      <AdminHeader
         title="Aprovações"
         description="Veículos e motoristas aguardando análise. Só cadastros aprovados poderão receber serviços."
       />
-      <Suspense fallback={<PageSkeleton />}>
+      <Suspense fallback={<AdminSkeleton />}>
         <Queue />
       </Suspense>
-    </AppShell>
+    </>
   );
 }
 

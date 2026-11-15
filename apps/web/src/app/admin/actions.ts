@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireArea } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { withValues, type FormValues } from "@/lib/form-values";
@@ -37,17 +38,46 @@ async function saveOrganization(formData: FormData): Promise<FormState> {
   if (taxId && (taxId.length < 5 || taxId.length > 32)) return { error: "Documento inválido." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("organizations").insert({
-    type,
-    trade_name: tradeName,
-    legal_name: legalName,
-    tax_id: taxId,
-    is_individual: isIndividual,
-  });
-  if (error) return { error: rpcError(error.message) };
+  const { data, error } = await supabase
+    .from("organizations")
+    .insert({
+      type,
+      trade_name: tradeName,
+      legal_name: legalName,
+      tax_id: taxId,
+      is_individual: isIndividual,
+    })
+    .select("id")
+    .single<{ id: string }>();
+  if (error || !data) return { error: rpcError(error?.message ?? "") };
 
   revalidatePath("/admin/organizacoes");
-  return { success: `${tradeName} foi cadastrada e está em análise.` };
+  redirect(`/admin/organizacoes/${data.id}`);
+}
+
+export async function updateOrganization(organizationId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  return withValues(await saveOrganizationData(organizationId, formData), formData);
+}
+
+async function saveOrganizationData(organizationId: string, formData: FormData): Promise<FormState> {
+  await requireArea("admin");
+  if (!UUID_RE.test(organizationId)) return { error: "Organização inválida." };
+  const tradeName = String(formData.get("trade_name") ?? "").trim();
+  const legalName = String(formData.get("legal_name") ?? "").trim() || tradeName;
+  const taxId = String(formData.get("tax_id") ?? "").replace(/[^\dA-Za-z]/g, "") || null;
+  if (tradeName.length < 2 || tradeName.length > 200) return { error: "Informe o nome fantasia." };
+  if (legalName.length > 200) return { error: "Razão social muito longa." };
+  if (taxId && (taxId.length < 5 || taxId.length > 32)) return { error: "Documento inválido." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("organizations")
+    .update({ trade_name: tradeName, legal_name: legalName, tax_id: taxId })
+    .eq("id", organizationId);
+  if (error) return { error: rpcError(error.message) };
+  revalidatePath(`/admin/organizacoes/${organizationId}`);
+  revalidatePath("/admin/organizacoes");
+  return { success: "Dados salvos." };
 }
 
 export async function setOrganizationStatus(organizationId: string, status: OrgStatus) {
