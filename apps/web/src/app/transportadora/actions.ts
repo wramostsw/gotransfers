@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireOrgRole } from "@/lib/auth";
+import { INACTIVE_ORG_MESSAGE, orgIsActive, requireOrgRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { LANGUAGES, LICENSE_CATEGORIES, PLATE_RE, type DriverStatus, type VehicleStatus } from "@/lib/fleet";
 import { withValues, type FormValues } from "@/lib/form-values";
@@ -35,6 +35,7 @@ export async function createVehicle(_prev: FormState, formData: FormData): Promi
 
 async function saveVehicle(formData: FormData): Promise<FormState> {
   const { membership } = await requireOrgRole("transportadora", MANAGERS);
+  if (!orgIsActive(membership)) return { error: INACTIVE_ORG_MESSAGE };
   const categoryId = String(formData.get("category_id") ?? "");
   const brand = String(formData.get("brand") ?? "").trim();
   const model = String(formData.get("model") ?? "").trim();
@@ -77,7 +78,8 @@ async function saveVehicle(formData: FormData): Promise<FormState> {
 }
 
 export async function setVehicleStatus(vehicleId: string, status: VehicleStatus) {
-  await requireOrgRole("transportadora", MANAGERS);
+  const { membership } = await requireOrgRole("transportadora", MANAGERS);
+  if (!orgIsActive(membership)) return;
   if (!UUID_RE.test(vehicleId) || !VEHICLE_STATUSES.includes(status)) return;
   const supabase = await createClient();
   await supabase.from("vehicles").update({ status }).eq("id", vehicleId);
@@ -90,6 +92,7 @@ export async function createDriver(_prev: FormState, formData: FormData): Promis
 
 async function saveDriver(formData: FormData): Promise<FormState> {
   const { membership } = await requireOrgRole("transportadora", MANAGERS);
+  if (!orgIsActive(membership)) return { error: INACTIVE_ORG_MESSAGE };
   const fullName = String(formData.get("full_name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim() || null;
   const email = String(formData.get("email") ?? "").trim().toLowerCase() || null;
@@ -123,7 +126,8 @@ async function saveDriver(formData: FormData): Promise<FormState> {
 }
 
 export async function setDriverStatus(driverId: string, status: DriverStatus) {
-  await requireOrgRole("transportadora", MANAGERS);
+  const { membership } = await requireOrgRole("transportadora", MANAGERS);
+  if (!orgIsActive(membership)) return;
   if (!UUID_RE.test(driverId) || !DRIVER_STATUSES.includes(status)) return;
   const supabase = await createClient();
   await supabase.from("drivers").update({ status }).eq("id", driverId);
@@ -131,7 +135,8 @@ export async function setDriverStatus(driverId: string, status: DriverStatus) {
 }
 
 export async function linkDriverUser(driverId: string, _prev: FormState): Promise<FormState> {
-  await requireOrgRole("transportadora", ["carrier_admin"]);
+  const { membership } = await requireOrgRole("transportadora", ["carrier_admin"]);
+  if (!orgIsActive(membership)) return { error: INACTIVE_ORG_MESSAGE };
   if (!UUID_RE.test(driverId)) return { error: "Motorista inválido." };
   const supabase = await createClient();
   const { error } = await supabase.rpc("link_driver_user", { p_driver: driverId });

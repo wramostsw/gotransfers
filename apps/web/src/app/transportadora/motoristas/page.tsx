@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppShell, PageHeader, PageSkeleton } from "@/components/app-shell";
-import { Badge, Button, Card, EmptyState } from "@/components/ui";
-import { requireOrgRole } from "@/lib/auth";
+import { Badge, Button, Card, EmptyState, InactiveOrgNotice } from "@/components/ui";
+import { orgIsActive, requireOrgRole } from "@/lib/auth";
 import {
   APPROVAL_LABEL,
   APPROVAL_TONE,
@@ -47,6 +47,7 @@ export default function MotoristasPage() {
 async function Content() {
   const { membership } = await requireOrgRole("transportadora", ["carrier_admin", "carrier_dispatcher"]);
   const isAdmin = membership.role === "carrier_admin";
+  const active = orgIsActive(membership);
   const supabase = await createClient();
   const { data: drivers, error } = await supabase
     .from("drivers")
@@ -58,10 +59,14 @@ async function Content() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card>
-        <h2 className="mb-4 text-base font-semibold text-ink">Novo motorista · {membership.organization.tradeName}</h2>
-        <CreateDriverForm />
-      </Card>
+      {active ? (
+        <Card>
+          <h2 className="mb-4 text-base font-semibold text-ink">Novo motorista · {membership.organization.tradeName}</h2>
+          <CreateDriverForm />
+        </Card>
+      ) : (
+        <InactiveOrgNotice orgName={membership.organization.tradeName} status={membership.organization.status} />
+      )}
 
       {error ? (
         <EmptyState title="Não foi possível carregar os motoristas">Tente recarregar a página.</EmptyState>
@@ -93,12 +98,14 @@ async function Content() {
                   {d.approval_status === "rejected" && d.rejection_reason ? (
                     <p className="rounded-xl bg-danger-50 px-3 py-2 text-sm text-danger-700">Motivo: {d.rejection_reason}</p>
                   ) : null}
+                  {active ? (
                   <div className="mt-auto flex flex-wrap items-start gap-2">
                     <form action={setDriverStatus.bind(null, d.id, d.status === "active" ? "inactive" : "active")}>
                       <Button size="sm" variant="secondary">{d.status === "active" ? "Desativar" : "Reativar"}</Button>
                     </form>
                     {isAdmin && !d.user_id ? <LinkDriverButton driverId={d.id} /> : null}
                   </div>
+                  ) : null}
                 </Card>
               </li>
             );

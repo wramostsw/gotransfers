@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireOrgRole } from "@/lib/auth";
+import { INACTIVE_ORG_MESSAGE, orgIsActive, requireOrgRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { withValues, type FormValues } from "@/lib/form-values";
 import { ROLES_BY_ORG_TYPE, isMemberRole, type MemberRole } from "@/lib/roles";
@@ -30,6 +30,7 @@ export async function addTeamMember(area: TeamArea, _prev: TeamFormState, formDa
 async function saveTeamMember(area: TeamArea, formData: FormData): Promise<TeamFormState> {
   if (area !== "agencia" && area !== "transportadora") return { error: "Área inválida." };
   const { membership } = await requireOrgRole(area, [ADMIN_ROLE[area]]);
+  if (!orgIsActive(membership)) return { error: INACTIVE_ORG_MESSAGE };
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const role = String(formData.get("role") ?? "");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Informe um e-mail válido." };
@@ -50,7 +51,8 @@ async function saveTeamMember(area: TeamArea, formData: FormData): Promise<TeamF
 
 export async function removeTeamMember(area: TeamArea, membershipId: string) {
   if (area !== "agencia" && area !== "transportadora") return;
-  await requireOrgRole(area, [ADMIN_ROLE[area]]);
+  const { membership } = await requireOrgRole(area, [ADMIN_ROLE[area]]);
+  if (!orgIsActive(membership)) return;
   if (!UUID_RE.test(membershipId)) return;
   const supabase = await createClient();
   await supabase.rpc("revoke_membership", { p_membership: membershipId });

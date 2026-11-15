@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { AppShell, PageHeader, PageSkeleton, type NavItem } from "@/components/app-shell";
 import { AddTeamMemberForm } from "@/components/team-form";
-import { Badge, Button, Card, EmptyState } from "@/components/ui";
-import { requireOrgRole } from "@/lib/auth";
+import { Badge, Button, Card, EmptyState, InactiveOrgNotice } from "@/components/ui";
+import { orgIsActive, requireOrgRole } from "@/lib/auth";
 import { ROLES_BY_ORG_TYPE, ROLE_LABEL, type MemberRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { removeTeamMember, type TeamArea } from "@/lib/team-actions";
@@ -43,18 +43,23 @@ async function Content({ area }: { area: TeamArea }) {
         .returns<ProfileRow[]>()
     : { data: [] as ProfileRow[] };
   const profiles = new Map((profileRows ?? []).map((p) => [p.id, p]));
+  const active = orgIsActive(membership);
   const roles = ROLES_BY_ORG_TYPE[membership.organization.type].filter((r) => r !== "driver");
 
   return (
     <div className="flex flex-col gap-6">
-      <Card>
-        <h2 className="mb-1 text-base font-semibold text-ink">Liberar acesso · {membership.organization.tradeName}</h2>
-        <p className="mb-4 text-sm text-muted">
-          A pessoa precisa já ter criado a conta no app com este e-mail.
-          {area === "transportadora" ? " Motoristas são liberados na tela de Motoristas." : ""}
-        </p>
-        <AddTeamMemberForm area={area} roles={roles} />
-      </Card>
+      {active ? (
+        <Card>
+          <h2 className="mb-1 text-base font-semibold text-ink">Liberar acesso · {membership.organization.tradeName}</h2>
+          <p className="mb-4 text-sm text-muted">
+            A pessoa precisa já ter criado a conta no app com este e-mail.
+            {area === "transportadora" ? " Motoristas são liberados na tela de Motoristas." : ""}
+          </p>
+          <AddTeamMemberForm area={area} roles={roles} />
+        </Card>
+      ) : (
+        <InactiveOrgNotice orgName={membership.organization.tradeName} status={membership.organization.status} />
+      )}
 
       {members.length === 0 ? (
         <EmptyState title="Ninguém tem acesso ainda" />
@@ -74,7 +79,7 @@ async function Content({ area }: { area: TeamArea }) {
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge tone="brand">{ROLE_LABEL[m.role]}</Badge>
-                    {m.user_id !== session.userId ? (
+                    {active && m.user_id !== session.userId ? (
                       <form action={removeTeamMember.bind(null, area, m.id)}>
                         <Button size="sm" variant="danger">Remover</Button>
                       </form>

@@ -96,6 +96,14 @@ export async function requireOrgRole(
   return { session, membership };
 }
 
+/** Empresa em análise, suspensa ou bloqueada só consulta; não cadastra nem altera. */
+export function orgIsActive(membership: Membership) {
+  return membership.organization.status === "active";
+}
+
+export const INACTIVE_ORG_MESSAGE =
+  "Sua empresa não está ativa no GoTransfer. Você pode consultar os dados, mas não cadastrar nem alterar. Fale com a equipe GoTransfer.";
+
 export function areasOf(session: SessionContext): Area[] {
   return [...new Set(session.memberships.map((m) => AREA_BY_ROLE[m.role]))];
 }

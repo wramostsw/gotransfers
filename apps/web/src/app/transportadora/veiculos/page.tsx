@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppShell, PageHeader, PageSkeleton } from "@/components/app-shell";
-import { Badge, Button, Card, EmptyState } from "@/components/ui";
-import { requireOrgRole } from "@/lib/auth";
+import { Badge, Button, Card, EmptyState, InactiveOrgNotice } from "@/components/ui";
+import { orgIsActive, requireOrgRole } from "@/lib/auth";
 import {
   APPROVAL_LABEL,
   APPROVAL_TONE,
@@ -58,6 +58,7 @@ export default function VeiculosPage() {
 
 async function Content() {
   const { membership } = await requireOrgRole("transportadora", ["carrier_admin", "carrier_dispatcher"]);
+  const active = orgIsActive(membership);
   const supabase = await createClient();
   const [{ data: categories }, { data: vehicles, error }] = await Promise.all([
     supabase
@@ -78,10 +79,14 @@ async function Content() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card>
-        <h2 className="mb-4 text-base font-semibold text-ink">Novo veículo · {membership.organization.tradeName}</h2>
-        <CreateVehicleForm categories={categories ?? []} />
-      </Card>
+      {active ? (
+        <Card>
+          <h2 className="mb-4 text-base font-semibold text-ink">Novo veículo · {membership.organization.tradeName}</h2>
+          <CreateVehicleForm categories={categories ?? []} />
+        </Card>
+      ) : (
+        <InactiveOrgNotice orgName={membership.organization.tradeName} status={membership.organization.status} />
+      )}
 
       {error ? (
         <EmptyState title="Não foi possível carregar os veículos">Tente recarregar a página.</EmptyState>
@@ -116,7 +121,7 @@ async function Content() {
                   <p className="rounded-xl bg-danger-50 px-3 py-2 text-sm text-danger-700">Motivo: {v.rejection_reason}</p>
                 ) : null}
                 <div className="mt-auto flex flex-wrap gap-2">
-                  {NEXT_STATUS[v.status].map((next) => (
+                  {(active ? NEXT_STATUS[v.status] : []).map((next) => (
                     <form key={next.status} action={setVehicleStatus.bind(null, v.id, next.status)}>
                       <Button size="sm" variant="secondary">{next.label}</Button>
                     </form>

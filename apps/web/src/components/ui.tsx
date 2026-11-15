@@ -116,3 +116,24 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 export function Skeleton({ className }: { className?: string }) {
   return <div aria-hidden className={cx("animate-pulse rounded-xl bg-line/70", className)} />;
 }
+
+const ORG_STATUS_TEXT: Record<string, string> = {
+  pending: "está em análise",
+  suspended: "está suspensa",
+  blocked: "está bloqueada",
+};
+
+/** Aviso para empresas que não estão ativas: só consulta, sem cadastrar nem alterar. */
+export function InactiveOrgNotice({ orgName, status }: { orgName: string; status: string }) {
+  return (
+    <div role="status" className="rounded-(--radius-card) border border-warning-700/30 bg-warning-50 px-5 py-4">
+      <p className="text-base font-semibold text-warning-700">
+        {orgName} {ORG_STATUS_TEXT[status] ?? "não está ativa"} no GoTransfer
+      </p>
+      <p className="mt-1 text-sm text-ink">
+        Você pode consultar os dados, mas cadastros e alterações ficam travados até a empresa ser ativada. Fale com a
+        equipe GoTransfer.
+      </p>
+    </div>
+  );
+}
