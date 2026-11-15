@@ -26,6 +26,8 @@ export const ENTITY_LABEL: Record<string, string> = {
   booking_segments: "Trecho da reserva",
   segment_costs: "Composição de preço",
   services: "Serviço",
+  service_offers: "Oferta",
+  service_assignments: "Designação",
 };
 
 export const ACTION_LABEL: Record<AuditRow["action"], string> = { insert: "Criou", update: "Alterou", delete: "Removeu" };
