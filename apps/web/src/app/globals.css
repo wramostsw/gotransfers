@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+/* Tokens da marca GoTransfer, tirados do logo. */
+@theme inline {
+  --color-brand-950: #000b45;
+  --color-brand-900: #001262;
+  --color-brand-850: #0a2477;
+  --color-brand-820: #23357f;
+  --color-brand-800: #00268e;
+  --color-brand-700: #0037b0;
+  --color-brand-600: #004ad0;
+  --color-brand-100: #dfe8ff;
+  --color-brand-50: #f0f4ff;
+
+  --color-accent-800: #8a3a0a;
+  --color-accent-700: #c2410c;
+  --color-accent-600: #e85d00;
+  --color-accent-500: #fe7100;
+  --color-accent-300: #fec804;
+  --color-accent-50: #fff1e6;
+  --color-mint: #34d399;
+  --color-on-dark: #c7d2f0;
+  --color-on-dark-muted: #9fb0dc;
+
+  --color-ink: #0b1736;
+  --color-muted: #55617f;
+  --color-line: #dfe5f0;
+  --color-canvas: #f4f6fb;
+  --color-surface: #ffffff;
+
+  --color-success-700: #0b7a53;
+  --color-success-50: #e7f6ef;
+  --color-warning-700: #8a5a00;
+  --color-warning-50: #fff4d6;
+  --color-danger-700: #b3261e;
+  --color-danger-50: #fdecea;
+
+  --font-sans: var(--font-geist-sans), system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-jakarta), var(--font-geist-sans), system-ui, sans-serif;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(11 23 54 / 0.05), 0 8px 24px rgb(11 23 54 / 0.06);
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,6 @@
+﻿# Projeto Netlify: gotransfer-app-6283 (https://gotransfer-app-6283.netlify.app)
+# A publicação a partir deste computador (Windows) falha ao empacotar o proxy.ts:
+# o adaptador do Netlify não copia os arquivos auxiliares do middleware no Windows.
+[build]
+  command = "npm run build"
+  publish = ".next"

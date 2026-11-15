@@ -1,0 +1,29 @@
+# Dependências e builds
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Variáveis de ambiente (nunca versionar)
+.env
+.env.*
+!.env.example
+
+# Netlify e Vercel (estado local)
+.netlify/
+.vercel/
+
+# Pacotes gerados
+*.zip
+
+# Documentos de negócio (apresentações, PDFs) ficam fora do código
+*.pdf
+*.pptx
+*.docx
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log

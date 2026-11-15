@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:/Users/Computador/Documents/Go Transfer/apps/web", "run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "pwa-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["apps/pwa-preview/serve.mjs"],
+      "port": 5173
+    }
+  ]
+}
