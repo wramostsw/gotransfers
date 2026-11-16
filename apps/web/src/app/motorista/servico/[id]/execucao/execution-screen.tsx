@@ -36,8 +36,8 @@ function stage(s: DriverService): { eyebrow: string; title: string; detail: stri
     },
     in_progress: {
       eyebrow: "EM VIAGEM",
-      title: `Chegada ${addMinutes(s.time, s.durationMin)}`,
-      detail: `${s.dropoff.title} · ${s.distanceKm} km`,
+      title: s.durationMin !== null ? `Chegada ${addMinutes(s.time, s.durationMin)}` : "A caminho do destino",
+      detail: s.distanceKm !== null ? `${s.dropoff.title} · ${String(s.distanceKm).replace(".", ",")} km` : s.dropoff.title,
       action: "Finalizar serviço",
     },
   };

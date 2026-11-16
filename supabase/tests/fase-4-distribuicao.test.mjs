@@ -139,6 +139,7 @@ const o2 = of.find((o) => o.provider_org_id === car2);
 const o3 = of.find((o) => o.provider_org_id === car3);
 
 const list1 = (await call(c1, "select public.provider_offers($1) as r", [car1]))[0].r;
+ok("lista traz a situacao da oferta e a do servico separadas", list1[0].status === "pending" && list1[0].service_status === "offered" && list1[0].offer_id === o1.id, JSON.stringify(list1[0]));
 ok(
   "transportadora ve a oferta sem preco da agencia e sem passageiro",
   list1.length === 1 && list1[0].payout_cents === 15200 && !("passenger" in list1[0]) && !("notes" in list1[0]) && !JSON.stringify(list1[0]).includes("20000") && list1[0].origin.name === "Aeroporto",
@@ -197,11 +198,15 @@ ok("liberar devolve a central e desfaz o repasse", s.status === "awaiting_dispat
 await call(admin, "select public.dispatch_service($1,'sequential',$2,600)", [s2.service, [car3, car1]]);
 of = (await offers(s2.service)).filter((o) => o.round === 2);
 ok("sequencial: o primeiro pendente, o segundo na fila, na ordem pedida", of.length === 2 && of[0].provider_org_id === car3 && of[0].status === "pending" && of[1].provider_org_id === car1 && of[1].status === "queued", JSON.stringify(of.map((o) => [o.status, o.position])));
-ok("quem esta na fila ainda nao ve a oferta", (await call(c1, "select public.provider_offers($1) as r", [car1]))[0].r.filter((o) => o.service_id === s2.service && o.status === "pending").length === 0);
+ok("quem esta na fila ainda nao ve a oferta", (await call(c1, "select public.provider_offers($1) as r", [car1]))[0].r.filter((o) => o.service_id === s2.service).length === 0);
 await fails("quem esta na fila nao aceita antes da vez", c1, "select public.respond_offer($1,true)", [of[1].id], "OFFER_UNAVAILABLE");
 ok("recusa com motivo", (await call(c3, "select public.respond_offer($1,false,'Agenda cheia') as r", [of[0].id]))[0].r === "declined");
 of = (await offers(s2.service)).filter((o) => o.round === 2);
 ok("recusa chama o proximo da fila", of[0].status === "declined" && of[0].decline_reason === "Agenda cheia" && of[1].status === "pending" && of[1].expires_at !== null);
+const afterDecline = (await call(c3, "select public.provider_offers($1) as r", [car3]))[0].r.find((o) => o.service_id === s2.service);
+ok("quem recusou ve a oferta como recusada", afterDecline?.status === "declined", JSON.stringify(afterDecline));
+const nowOpen = (await call(c1, "select public.provider_offers($1) as r", [car1]))[0].r.find((o) => o.service_id === s2.service);
+ok("o proximo da fila passa a ver a oferta aberta", nowOpen?.status === "pending" && nowOpen.expires_at !== null, JSON.stringify(nowOpen));
 
 // expiracao
 await q("update public.service_offers set expires_at = now() - interval '1 minute' where id=$1", [of[1].id]);

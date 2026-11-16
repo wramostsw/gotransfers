@@ -10,6 +10,8 @@ export const AGENCY_NAV: NavItem[] = [
 
 export const CARRIER_NAV: NavItem[] = [
   { href: "/transportadora", label: "Visão geral" },
+  { href: "/transportadora/ofertas", label: "Ofertas" },
+  { href: "/transportadora/servicos", label: "Serviços" },
   { href: "/transportadora/veiculos", label: "Veículos" },
   { href: "/transportadora/motoristas", label: "Motoristas" },
   { href: "/transportadora/equipe", label: "Equipe" },

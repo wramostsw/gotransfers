@@ -78,3 +78,16 @@ Limite do teste: o banco embutido usa uma única conexão, então dois aceites *
 - Bloqueios manuais de agenda (folga, manutenção com data) e disponibilidade on-line do motorista.
 - Ocorrências, passageiro ausente e falha operacional (Fase 5).
 - Multa quando a agência cancela depois do aceite.
+
+## Correção (migração 7)
+
+`supabase/migrations/20261115000007_correcao_ofertas.sql`: `provider_offers` devolvia a situação do serviço no campo `status`, no lugar da situação da oferta. Agora `status` é a da oferta e `service_status` é a do serviço. O teste foi reforçado para pegar esse caso (68 verificações).
+
+## Telas
+
+- Admin · **Central de serviços** (`/admin/servicos`): abas por situação, destaque para embarques em menos de 24 h; detalhe com envio de oferta (simultânea, sequencial, direcionada), prestadores elegíveis, atribuição manual, designação em nome do prestador, interromper, retirar prestador, ofertas por rodada, histórico e designações.
+- Transportadora · **Ofertas** (`/transportadora/ofertas`): aceitar ou recusar com motivo; vê o repasse, nunca o preço da agência.
+- Transportadora · **Serviços** (`/transportadora/servicos`): designar ou trocar motorista e veículo (só os compatíveis com a categoria), devolver à GoTransfer.
+- **App do motorista**: com cadastro de motorista ligado à conta, usa dados reais (`driver_services`) e cada etapa é gravada no servidor antes de a tela avançar. Equipe GoTransfer sem cadastro de motorista continua vendo a demonstração. Ganhos, ocorrências e documentos ainda são da demonstração.
+
+Conferido no navegador com a conta de superadmin: central, detalhe do serviço GT-000001, portal da transportadora e app em modo demonstração carregam sem erro. O fluxo oferta → aceite → designação → execução ainda não foi percorrido pelas telas.

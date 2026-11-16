@@ -35,7 +35,7 @@ export function AgendaScreen() {
   });
 
   const dayServices = services.filter((s) => s.dayOffset === selected).sort(compareService);
-  const total = dayServices.reduce((sum, s) => sum + s.payoutCents, 0);
+  const total = dayServices.reduce((sum, s) => sum + (s.payoutCents ?? 0), 0);
   const firstOpen = dayServices.find((s) => s.step !== "completed");
 
   return (
@@ -129,7 +129,7 @@ function AgendaItem({ service: s, highlight }: { service: DriverService; highlig
 }
 
 function Gap({ from, to }: { from: DriverService; to: DriverService }) {
-  const end = addMinutes(from.time, from.durationMin);
+  const end = addMinutes(from.time, from.durationMin ?? 0);
   const [eh, em] = end.split(":").map(Number);
   const [sh, sm] = to.time.split(":").map(Number);
   const minutes = sh * 60 + sm - (eh * 60 + em);

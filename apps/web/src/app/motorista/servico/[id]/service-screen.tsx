@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Icon } from "@/components/icons";
-import { formatMoney } from "@/lib/driver/mock";
+import { formatMoney, routeInfo } from "@/lib/driver/mock";
 import { useDriver } from "../../driver-store";
 import { MapArt, dayLabel } from "../../ui";
 
@@ -44,7 +44,7 @@ export function ServiceScreen() {
           <Icon name="back" size={22} strokeWidth={2.2} />
         </Link>
         <span className="absolute right-4 top-5 rounded-full bg-surface px-3 py-1.5 text-xs font-bold shadow-lg">
-          {s.distanceKm} km · cerca de {s.durationMin} min
+          {routeInfo(s)}
         </span>
       </div>
 
@@ -64,7 +64,7 @@ export function ServiceScreen() {
         <section className="flex flex-col gap-3 rounded-[18px] border border-line bg-surface p-4">
           <div className="flex gap-3">
             <span aria-hidden className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-brand-100/70 text-brand-800">
-              <Icon name={s.kind === "bus_station" ? "bus" : "plane"} size={20} />
+              <Icon name={s.kind === "bus_station" ? "bus" : s.kind === "point_to_point" ? "pin" : "plane"} size={20} />
             </span>
             <div>
               <p className="text-[15px] font-bold">Embarque · {s.pickup.title}</p>
@@ -110,14 +110,15 @@ export function ServiceScreen() {
               >
                 <Icon name="chat" size={20} />
               </button>
-              <button
-                type="button"
-                onClick={() => notify("Na versão final, a ligação passa por um número protegido.")}
-                aria-label="Ligar para o passageiro"
-                className="grid size-11 place-items-center rounded-xl border border-line text-brand-800"
-              >
-                <Icon name="phone" size={20} />
-              </button>
+              {s.passenger.phone ? (
+                <a href={`tel:${s.passenger.phone.replace(/[^\d+]/g, "")}`} aria-label="Ligar para o passageiro" className="grid size-11 place-items-center rounded-xl border border-line text-brand-800">
+                  <Icon name="phone" size={20} />
+                </a>
+                ) : (
+                <button type="button" onClick={() => notify("A agência não informou o telefone do passageiro. Fale com a central.")} aria-label="Ligar para o passageiro" className="grid size-11 place-items-center rounded-xl border border-line text-brand-800">
+                  <Icon name="phone" size={20} />
+                </button>
+                )}
             </>
           ) : null}
         </section>

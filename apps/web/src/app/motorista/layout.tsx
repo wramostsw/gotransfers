@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Image from "next/image";
 import { Suspense } from "react";
-import { DriverProvider } from "./driver-store";
 import { DriverGate } from "./gate";
 
 const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin"], weight: ["600", "700", "800"] });
@@ -23,13 +22,9 @@ export default function MotoristaLayout({ children }: LayoutProps<"/motorista">)
   return (
     <div className={`${jakarta.variable} min-h-dvh bg-brand-950 sm:py-6`}>
       <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-canvas text-ink sm:h-[min(calc(100dvh-3rem),920px)] sm:rounded-[2rem] sm:shadow-2xl">
-        <p className="bg-brand-950 px-4 pb-1 pt-[max(env(safe-area-inset-top),0.25rem)] text-center text-[11px] font-semibold tracking-wide text-on-dark">
-          MODO DEMONSTRAÇÃO · DADOS FICTÍCIOS
-        </p>
+        <div aria-hidden className="bg-brand-950 pt-[max(env(safe-area-inset-top),0.25rem)]" />
         <Suspense fallback={<Splash />}>
-          <DriverGate>
-            <DriverProvider>{children}</DriverProvider>
-          </DriverGate>
+          <DriverGate>{children}</DriverGate>
         </Suspense>
       </div>
     </div>

@@ -3,13 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/icons";
-import { DRIVER, formatMoney } from "@/lib/driver/mock";
+import { formatMoney } from "@/lib/driver/mock";
 import { formatCountdown, secondsLeft, useDriver } from "./driver-store";
 import { compareService, relativeStart } from "./time";
 import { BottomNav, KindChip, RouteLine } from "./ui";
 
 export function HomeScreen() {
-  const { online, setOnline, services, offers, now } = useDriver();
+  const { online, setOnline, services, offers, now, profile: DRIVER, live } = useDriver();
   const today = services.filter((s) => s.dayOffset === 0);
   const next = [...services].filter((s) => s.step !== "completed").sort(compareService)[0];
   const firstOffer = [...offers].sort((a, b) => a.expiresAt - b.expiresAt)[0];
@@ -37,7 +37,7 @@ export function HomeScreen() {
               {online ? "Disponível" : "Indisponível"}
             </p>
             <p className="text-[13px] text-on-dark">
-              {online ? "Recebendo ofertas na sua região" : "Você não recebe novas ofertas"}
+              {live ? (DRIVER.isIndividual ? "Ofertas chegam no portal da sua empresa" : "Serviços são designados pela sua empresa") : online ? "Recebendo ofertas na sua região" : "Você não recebe novas ofertas"}
             </p>
           </div>
           <button
@@ -58,8 +58,8 @@ export function HomeScreen() {
       <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 py-4">
         <div className="grid grid-cols-3 gap-2.5">
           <Stat value={String(today.length)} label="serviços hoje" />
-          <Stat value={formatMoney(today.reduce((sum, s) => sum + s.payoutCents, 0)).replace(",00", "")} label="hoje" />
-          <Stat value={DRIVER.rating} label="avaliação" />
+          <Stat value={formatMoney(today.reduce((sum, s) => sum + (s.payoutCents ?? 0), 0)).replace(",00", "")} label="hoje" />
+          <Stat value={DRIVER.rating ?? "—"} label="avaliação" />
         </div>
 
         {firstOffer ? (

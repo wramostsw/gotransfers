@@ -3,7 +3,7 @@
 // Valores seguem a planilha do modelo: aeroporto R$ 250 ao passageiro -> R$ 152,00 ao prestador;
 // rodoviária R$ 160 -> R$ 97,28.
 
-export type ServiceKind = "airport_arrival" | "airport_departure" | "bus_station";
+export type ServiceKind = "airport_arrival" | "airport_departure" | "bus_station" | "point_to_point";
 
 /** Etapas da execução, na ordem do PRD (seção 10.4). */
 export type Step = "assigned" | "en_route" | "arrived" | "boarding" | "in_progress" | "completed";
@@ -20,12 +20,14 @@ export type DriverService = {
   pickup: { title: string; detail: string; meetingPoint?: string };
   dropoff: { title: string; detail: string };
   flight?: { number: string; info: string };
-  passenger: { initials: string; name: string; count: number; language?: string };
+  passenger: { initials: string; name: string; count: number; language?: string; phone?: string | null };
   luggage: { large: number; medium: number };
   category: string;
-  payoutCents: number;
-  distanceKm: number;
-  durationMin: number;
+  /** Nulo quando o motorista é de empresa: o valor é da transportadora. */
+  payoutCents: number | null;
+  /** Nulos quando a agência não informou. */
+  distanceKm: number | null;
+  durationMin: number | null;
   toleranceMin: number;
   agencyNote?: string;
   step: Step;
@@ -44,6 +46,7 @@ export const KIND_LABEL: Record<ServiceKind, string> = {
   airport_arrival: "Chegada no aeroporto",
   airport_departure: "Saída para o aeroporto",
   bus_station: "Rodoviária",
+  point_to_point: "Ponto a ponto",
 };
 
 export const DRIVER = {
@@ -202,6 +205,30 @@ export const DOCUMENTS: Array<{ id: string; title: string; detail: string; statu
   { id: "curso", title: "Curso de transporte de passageiros", detail: "Vence em 12 dias", status: "expiring" },
 ];
 
-export function formatMoney(cents: number) {
+export function formatMoney(cents: number | null) {
+  if (cents === null) return "—";
   return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+/** Quem está usando o app: dados reais do motorista ou o perfil fictício da demonstração. */
+export type DriverProfile = {
+  name: string;
+  firstName: string;
+  initials: string;
+  carrier: string;
+  rating: string | null;
+  totalServices: number;
+  vehicle: { name: string; plate: string; category: string; seats: number; luggageLarge: number } | null;
+  languages: string;
+  documents: Array<{ id: string; title: string; detail: string; status: DocumentStatus }>;
+  /** Autônomo responde ofertas pelo portal da transportadora. */
+  isIndividual: boolean;
+};
+
+export const DEMO_PROFILE: DriverProfile = { ...DRIVER, documents: DOCUMENTS, isIndividual: false };
+
+/** "32 km · cerca de 40 min", ou só o que a agência informou. */
+export function routeInfo(s: { distanceKm: number | null; durationMin: number | null }) {
+  const parts = [s.distanceKm !== null ? `${String(s.distanceKm).replace(".", ",")} km` : null, s.durationMin !== null ? `cerca de ${s.durationMin} min` : null];
+  return parts.filter(Boolean).join(" · ") || "Distância não informada";
 }

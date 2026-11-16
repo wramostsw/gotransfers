@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@/components/icons";
-import { formatMoney, type ServiceKind } from "@/lib/driver/mock";
+import { formatMoney, routeInfo, type ServiceKind } from "@/lib/driver/mock";
 import { formatCountdown, secondsLeft, useDriver } from "../driver-store";
 import { KindChip, RouteLine, ScreenTitle, TabScreen, Tag } from "../ui";
 
@@ -111,7 +111,7 @@ export function OffersScreen() {
               </div>
               <RouteLine
                 from={{ title: s.pickup.title, detail: `Você está a ${offer.distanceToPickupKm} km · ${offer.pickupHint}` }}
-                to={{ title: s.dropoff.title, detail: `${s.distanceKm} km · cerca de ${s.durationMin} min` }}
+                to={{ title: s.dropoff.title, detail: routeInfo(s) }}
               />
               <div className="flex flex-wrap gap-2">
                 <Tag>{s.category}</Tag>

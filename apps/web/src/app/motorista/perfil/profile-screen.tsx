@@ -4,12 +4,12 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { signOut } from "@/app/(auth)/actions";
 import { Icon } from "@/components/icons";
-import { DOCUMENTS, DRIVER } from "@/lib/driver/mock";
 import { useDriver } from "../driver-store";
 import { BottomNav } from "../ui";
 
 export function ProfileScreen() {
-  const { uploadedDocs, markDocUploaded, notify } = useDriver();
+  const { uploadedDocs, markDocUploaded, notify, profile: DRIVER } = useDriver();
+  const DOCUMENTS = DRIVER.documents;
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
   const pending = DOCUMENTS.filter((d) => d.status === "expiring" && !uploadedDocs.includes(d.id)).length;
@@ -23,7 +23,7 @@ export function ProfileScreen() {
         <div className="min-w-0 flex-1">
           <h1 className="font-display text-[22px] font-extrabold">{DRIVER.name}</h1>
           <p className="mt-0.5 text-[13px] text-muted">
-            {DRIVER.carrier} · ★ {DRIVER.rating} · {DRIVER.totalServices} serviços
+            {DRIVER.carrier}{DRIVER.rating ? ` · ★ ${DRIVER.rating}` : ""} · {DRIVER.totalServices} serviços
           </p>
           <span className="mt-1.5 inline-block rounded-full bg-success-50 px-2.5 py-0.5 text-[11px] font-bold text-success-700">Cadastro aprovado</span>
         </div>
@@ -99,9 +99,11 @@ export function ProfileScreen() {
               <Icon name="car" />
             </span>
             <div>
-              <p className="text-[15px] font-bold">{DRIVER.vehicle.name}</p>
+              <p className="text-[15px] font-bold">{DRIVER.vehicle?.name ?? "Nenhum veículo designado"}</p>
               <p className="mt-0.5 text-xs text-muted">
-                {DRIVER.vehicle.plate} · {DRIVER.vehicle.category} · {DRIVER.vehicle.seats} passageiros · {DRIVER.vehicle.luggageLarge} malas grandes
+                {DRIVER.vehicle
+                  ? [DRIVER.vehicle.plate, DRIVER.vehicle.category, DRIVER.vehicle.seats ? `${DRIVER.vehicle.seats} passageiros` : null, DRIVER.vehicle.luggageLarge ? `${DRIVER.vehicle.luggageLarge} malas grandes` : null].filter(Boolean).join(" · ")
+                  : "O veículo aparece quando sua empresa designar um serviço."}
               </p>
             </div>
           </div>

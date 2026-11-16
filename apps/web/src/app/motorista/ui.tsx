@@ -86,7 +86,7 @@ export function BackHeader({ href, title, subtitle }: { href: string; title: str
 export function KindChip({ service, withDay }: { service: DriverService; withDay?: boolean }) {
   const tone =
     service.kind === "bus_station" ? "bg-accent-50 text-accent-800" : "bg-brand-100/70 text-brand-800";
-  const icon: IconName = service.kind === "bus_station" ? "bus" : "plane";
+  const icon: IconName = service.kind === "bus_station" ? "bus" : service.kind === "point_to_point" ? "pin" : "plane";
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${tone}`}>
       <Icon name={icon} size={14} strokeWidth={2} />

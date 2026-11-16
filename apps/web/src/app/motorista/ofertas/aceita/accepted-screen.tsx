@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Icon } from "@/components/icons";
-import { DRIVER, formatMoney } from "@/lib/driver/mock";
+import { formatMoney } from "@/lib/driver/mock";
 import { useDriver } from "../../driver-store";
 import { dayLabel } from "../../ui";
 
 export function AcceptedScreen() {
   const params = useSearchParams();
-  const { services } = useDriver();
+  const { services, profile: DRIVER } = useDriver();
   const service = services.find((s) => s.id === params.get("servico"));
 
   if (!service) {
@@ -54,7 +54,7 @@ export function AcceptedScreen() {
           <div className="flex justify-between gap-3">
             <dt className="text-muted">Veículo</dt>
             <dd className="font-semibold">
-              {DRIVER.vehicle.name.replace("Toyota ", "")} · {DRIVER.vehicle.plate}
+              {DRIVER.vehicle ? `${DRIVER.vehicle.name.replace("Toyota ", "")} · ${DRIVER.vehicle.plate}` : "A definir"}
             </dd>
           </div>
           <div className="flex justify-between gap-3">
